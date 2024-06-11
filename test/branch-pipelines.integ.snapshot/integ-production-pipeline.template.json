@@ -296,6 +296,15 @@
   "integproductionPipelineF445BE79": {
    "Type": "AWS::CodePipeline::Pipeline",
    "Properties": {
+    "ArtifactStore": {
+     "Location": {
+      "Ref": "integproductionPipelineArtifactsBucketE21368B1"
+     },
+     "Type": "S3"
+    },
+    "Name": "integ-main",
+    "PipelineType": "V1",
+    "RestartExecutionOnUpdate": true,
     "RoleArn": {
      "Fn::GetAtt": [
       "integproductionPipelineRole7F1CF00A",
@@ -347,7 +356,7 @@
          "ProjectName": {
           "Ref": "integproductionPipelineBuildSynthCdkBuildProject0D5DF9AB"
          },
-         "EnvironmentVariables": "[{\"name\":\"_PROJECT_CONFIG_HASH\",\"type\":\"PLAINTEXT\",\"value\":\"0d6766aa9dd62b74d1be6d2e3753a0ac98cf93ed9005801095ee072e4d8289d9\"}]"
+         "EnvironmentVariables": "[{\"name\":\"_PROJECT_CONFIG_HASH\",\"type\":\"PLAINTEXT\",\"value\":\"8b1d005d5109095c935a9da5928bf7ab6884966c08861997652508aaee0ffddc\"}]"
         },
         "InputArtifacts": [
          {
@@ -384,7 +393,7 @@
          "ProjectName": {
           "Ref": "integproductionUpdatePipelineSelfMutation407BF49C"
          },
-         "EnvironmentVariables": "[{\"name\":\"_PROJECT_CONFIG_HASH\",\"type\":\"PLAINTEXT\",\"value\":\"73e1e2b984a58ac1d9e1fb12ead8775dec9d580f1d735a7c888a24071ef63e39\"}]"
+         "EnvironmentVariables": "[{\"name\":\"_PROJECT_CONFIG_HASH\",\"type\":\"PLAINTEXT\",\"value\":\"5416616c0aae82ccc84afeb04e54c3e5ef4b54675420cb78d42073c89a77baea\"}]"
         },
         "InputArtifacts": [
          {
@@ -540,15 +549,7 @@
       ],
       "Name": "integ"
      }
-    ],
-    "ArtifactStore": {
-     "Location": {
-      "Ref": "integproductionPipelineArtifactsBucketE21368B1"
-     },
-     "Type": "S3"
-    },
-    "Name": "integ-main",
-    "RestartExecutionOnUpdate": true
+    ]
    },
    "DependsOn": [
     "integproductionPipelineRoleDefaultPolicy77C5984C",
@@ -842,9 +843,14 @@
     "Artifacts": {
      "Type": "CODEPIPELINE"
     },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "Description": "Pipeline step integ-production-pipeline/Pipeline/Build/Synth",
+    "EncryptionKey": "alias/aws/s3",
     "Environment": {
      "ComputeType": "BUILD_GENERAL1_LARGE",
-     "Image": "aws/codebuild/standard:6.0",
+     "Image": "aws/codebuild/standard:7.0",
      "ImagePullCredentialsType": "CODEBUILD",
      "PrivilegedMode": true,
      "Type": "LINUX_CONTAINER"
@@ -858,12 +864,7 @@
     "Source": {
      "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"build\": {\n      \"commands\": [\n        \"cd .\",\n        \"yarn install --no-immutable\",\n        \"yarn cdk synth -o out\"\n      ]\n    }\n  },\n  \"artifacts\": {\n    \"base-directory\": \"./out\",\n    \"files\": \"**/*\"\n  }\n}",
      "Type": "CODEPIPELINE"
-    },
-    "Cache": {
-     "Type": "NO_CACHE"
-    },
-    "Description": "Pipeline step integ-production-pipeline/Pipeline/Build/Synth",
-    "EncryptionKey": "alias/aws/s3"
+    }
    }
   },
   "integproductionPipelineintegTrimCloudAssemblyStepRole6B5D4771": {
@@ -1010,9 +1011,14 @@
     "Artifacts": {
      "Type": "CODEPIPELINE"
     },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "Description": "Pipeline step integ-production-pipeline/Pipeline/integ/TrimCloudAssemblyStep",
+    "EncryptionKey": "alias/aws/s3",
     "Environment": {
      "ComputeType": "BUILD_GENERAL1_SMALL",
-     "Image": "aws/codebuild/standard:6.0",
+     "Image": "aws/codebuild/standard:7.0",
      "ImagePullCredentialsType": "CODEBUILD",
      "PrivilegedMode": false,
      "Type": "LINUX_CONTAINER"
@@ -1026,12 +1032,7 @@
     "Source": {
      "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"build\": {\n      \"commands\": [\n        \"CLOUDASM_PATH=$(aws s3api list-buckets | grep 'integ-production-pipelin-' | awk '{print $2}' | sed 's/\\\"//g' | sed 's/,//g')/integ-main/Synth_Outp\",\n        \"LATEST=$(aws s3 ls s3://$CLOUDASM_PATH/ | sort | tail -n 1 | awk '{print $4}')\",\n        \"aws s3 cp s3://$CLOUDASM_PATH/$LATEST .\",\n        \"unzip $LATEST -d tmp\",\n        \"cd tmp\",\n        \"rm -rf asset.*\",\n        \"zip -r -A $LATEST *\",\n        \"aws s3 cp $LATEST s3://$CLOUDASM_PATH/\"\n      ]\n    }\n  }\n}",
      "Type": "CODEPIPELINE"
-    },
-    "Cache": {
-     "Type": "NO_CACHE"
-    },
-    "Description": "Pipeline step integ-production-pipeline/Pipeline/integ/TrimCloudAssemblyStep",
-    "EncryptionKey": "alias/aws/s3"
+    }
    }
   },
   "integproductionCodeBuildActionRole140AABEC": {
@@ -1274,13 +1275,19 @@
     "Artifacts": {
      "Type": "CODEPIPELINE"
     },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "Description": "Pipeline step integ-production-pipeline/Pipeline/UpdatePipeline/SelfMutate",
+    "EncryptionKey": "alias/aws/s3",
     "Environment": {
      "ComputeType": "BUILD_GENERAL1_SMALL",
-     "Image": "aws/codebuild/standard:6.0",
+     "Image": "aws/codebuild/standard:7.0",
      "ImagePullCredentialsType": "CODEBUILD",
      "PrivilegedMode": false,
      "Type": "LINUX_CONTAINER"
     },
+    "Name": "integ-main-selfupdate",
     "ServiceRole": {
      "Fn::GetAtt": [
       "integproductionUpdatePipelineSelfMutationRole97B16E7C",
@@ -1290,13 +1297,7 @@
     "Source": {
      "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"install\": {\n      \"commands\": [\n        \"npm install -g aws-cdk@2\"\n      ]\n    },\n    \"build\": {\n      \"commands\": [\n        \"cdk -a . deploy integ-production-pipeline --require-approval=never --verbose\"\n      ]\n    }\n  }\n}",
      "Type": "CODEPIPELINE"
-    },
-    "Cache": {
-     "Type": "NO_CACHE"
-    },
-    "Description": "Pipeline step integ-production-pipeline/Pipeline/UpdatePipeline/SelfMutate",
-    "EncryptionKey": "alias/aws/s3",
-    "Name": "integ-main-selfupdate"
+    }
    }
   }
  },

@@ -57,7 +57,7 @@
     "@typescript-eslint/eslint-plugin": "^7",
     "@typescript-eslint/parser": "^7",
     "aws-cdk": "^2",
-    "aws-cdk-lib": "2.78.0",
+    "aws-cdk-lib": "2.145.0",
     "constructs": "10.0.5",
     "delay": "^5.0.0",
     "eslint": "^8",
@@ -81,7 +81,7 @@
   },
   "peerDependencies": {
     "@kikoda/generated-config": "^0.5.1",
-    "aws-cdk-lib": "^2.78.0",
+    "aws-cdk-lib": "^2.145.0",
     "constructs": "^10.0.5"
   },
   "dependencies": {
