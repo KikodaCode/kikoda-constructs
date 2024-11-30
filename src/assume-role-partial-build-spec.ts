@@ -27,12 +27,7 @@ export class AssumeRolePartialBuildSpec {
       phases: {
         install: {
           commands: [
-            `ASSUME_ROLE_ARN=${roleArn}`,
-            'TEMP_ROLE=$(aws sts assume-role --role-arn $ASSUME_ROLE_ARN --role-session-name test)',
-            'export TEMP_ROLE',
-            'export AWS_ACCESS_KEY_ID=$(echo "${TEMP_ROLE}" | jq -r \'.Credentials.AccessKeyId\')', // TODO: JQ dependency
-            'export AWS_SECRET_ACCESS_KEY=$(echo "${TEMP_ROLE}" | jq -r \'.Credentials.SecretAccessKey\')',
-            'export AWS_SESSION_TOKEN=$(echo "${TEMP_ROLE}" | jq -r \'.Credentials.SessionToken\')',
+            `export $(printf "AWS_ACCESS_KEY_ID=%s AWS_SECRET_ACCESS_KEY=%s AWS_SESSION_TOKEN=%s" $(aws sts assume-role --role-arn ${roleArn} --role-session-name test --query "Credentials.[AccessKeyId,SecretAccessKey, SessionToken]" --output text))`,
           ],
         },
       },
