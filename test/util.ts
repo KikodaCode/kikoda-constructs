@@ -1,4 +1,9 @@
+import { CfnElement, IResource, Stack } from 'aws-cdk-lib';
 import { CloudAssembly } from 'aws-cdk-lib/cx-api';
+
+export function getLogicalId(stack: Stack, resource: IResource) {
+  return stack.getLogicalId(resource.node.findChild('Resource') as CfnElement);
+}
 
 export function getInfoAnnotations(casm: CloudAssembly) {
   return getMetadata(casm, 'info');
